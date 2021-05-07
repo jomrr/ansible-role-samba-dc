@@ -1,0 +1,101 @@
+---
+# role: ansible-role-samba-dc
+# file: defaults/main.yml
+
+# The role is disabled by default, so you do not get in trouble.
+# Checked in tasks/main.yml which uses a tasks block if enabled.
+samba_dc_role_enabled: false
+
+# Set to true to provision a DC. To join a DC to an existing AD leave on false.
+samba_dc_domain_provision: false
+
+samba_dc_keytab_file: "/etc/krb5.keytab"
+
+samba_dc_kerberos_method: "secrets and keytab"
+
+samba_dc_use_rfc2307: false
+
+# The group name of your ansible inventory for domain controllers.
+# Used to determine namesevers for resolv.conf on samba member servers,
+# because they should use existing domain controllers as their name servers.
+samba_dc_inventory_group_name: "dcs"
+
+# This uses the ansible fact ansible_domain as dns domain and realm by default.
+# Upper and lowercase conversion is done automatically as needed.
+# E.g. if samba_dc_dns_domain: "home.example.com" then
+# realm = HOME.EXAMPLE.COM
+# workgroup = HOME
+# samba domain = HOME
+# see: https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller#Parameter_Explanation
+samba_dc_dns_domain: "{{ ansible_domain | default(ansible_hostname) }}"
+
+# Enable an AD site,
+# see https://wiki.samba.org/index.php/Active_Directory_Sites.
+# AFFECTS: samba_dc_role=domain controller and samba_prvision=true.
+samba_dc_site: ""
+
+# Bind only to interfaces defined in list samba_dc_interfaces.
+samba_dc_bind_interfaces_only: true
+
+# Interfaces to bind to. NOTE: loopback must be included on DCs.
+samba_dc_interfaces: "{{ ansible_interfaces }}"
+#  - eno0
+#  - br-dmz
+
+# Password of Active Directory Administrator account.
+samba_dc_admin_password: "Chang3MeN0w!"
+
+# Samba DNS Backend to use in provision command.
+# can be SAMBA_INTERNAL or BIND9_DLZ.
+# see: https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller#Setting_up_the_AD_DNS_back_end
+samba_dc_dns_backend: "SAMBA_INTERNAL"
+
+# DNS Forwarder on domain controllers.
+samba_dc_dns_forwarders:
+  - "9.9.9.9"
+
+# Dictionary for smb.conf variables. This will override settings that
+# already exist, as it uses ansibles ini_file module.
+# For existing settings see templates/smb.conf.j2.
+# STRUCTURE: { section1: { setting1: value1, setting2: ... }, { section2: ...} }
+# EXAMPLE:
+# samba_dc_smb_conf:
+#   global:
+#     bind_interfaces: no             #> this gets replaced, role default is yes
+#     template shell: /bin/bash       #> this is added
+#     template homedir: /home/%D/%U   #> this is added
+samba_dc_smb_conf: {}
+
+# Password settings for domain.
+samba_dc_pwd_complexity: "on"
+samba_dc_pwd_min_age: 1
+samba_dc_pwd_max_age: 768
+samba_dc_pwd_min_len: 12
+samba_dc_pwd_history_len: 10
+
+# Enable authentication via keytab for GSSAPI Authentication
+samba_dc_keytab_enabled: true
+
+# Groups to create in AD.
+# Samba does not provide an automated mechanism of maintaining the
+# gidNumber attribute, so you have to specify manually.
+samba_dc_groups: []
+# - name: test-group01
+#   gid: 10101
+#   members:
+#     - test01
+#     - test02
+
+# Users to create in AD.
+# Samba does not provide an automated mechanism of maintaining the
+# uidNumber attribute, so you have to specify manually.
+samba_dc_users: []
+# - name: test01
+#   uid: 10101
+#   password: Sup3rS@fe123!
+# - name: test02
+#   uid: 10102
+#   password: Sup3rS@fe123!
+
+# Set the no_log option, when using samba-tool with --username and --password
+samba_dc_no_log: true

@@ -1,0 +1,16 @@
+# {{ template_destpath }}
+# vim: set ft=conf
+# {{ ansible_managed }}
+
+{% set samba_nameservers = groups[samba_dc_inventory_group_name] | map('extract', hostvars, ['ansible_default_ipv4.address']) | list %}
+
+domain {{ samba_realm | lower }}
+search {{ samba_realm | lower }}
+{% if samba_role in ['dc','domain controller','active directory domain controller'] %}
+nameserver 127.0.0.1
+nameserver {{ samba_dns_forwarder }}
+{% elif samba_role in ['member','member server'] %}
+{%  for nameserver in samba_nameservers %}
+nameserver {{ nameserver }}
+{%  endfor %}
+{% endif %}

@@ -1,0 +1,93 @@
+---
+# role: ansible-role-samba-dc
+# file: vars/main.yml
+
+# packages to install for samba domain controller
+_samba_dc_packages:
+  Archlinux:
+    - acl
+    - attr
+    - bind-tools
+    - dnsutils
+    - krb5
+    - python-dnspython
+    - openresolv
+    - samba
+  Debian:
+    - acl
+    - attr
+    - dnsutils
+    - krb5-config
+    - krb5-user
+    - libpam-krb5
+    - samba
+    - samba-dsdb-modules
+    - samba-vfs-modules
+    - smbclient
+    - winbind
+  Fedora:
+    - acl
+    - attr
+    - dnsutils
+    - samba
+    - samba-client
+    - samba-dc
+    - krb5-workstation
+
+samba_dc_packages: |
+  _samba_dc_packages[ansible_os_family]
+  if    _samba_dc_packages[ansible_os_family] is defined
+  else  _samba_dc_packages[ansible_distribution]
+
+_samba_dc_bind_packages:
+  Archlinux:
+    - bind
+  Debian:
+    - bind9
+  Fedora:
+    - samba-dc-bind-dlz
+
+samba_dc_bind_packages: |
+  _samba_dc_bind_packages[ansible_os_family]
+  if    _samba_dc_bind_packages[ansible_os_family] is defined
+  else  _samba_dc_bind_packages[ansible_distribution]
+
+_samba_dc_enabled_services:
+  Archlinux:
+    - smb
+    - nmb
+  Debian:
+    - samba-ad-dc
+  Fedora:
+    - samba
+
+samba_dc_enabled_services: |
+  _samba_dc_enabled_services[ansible_os_family]
+  if    _samba_dc_enabled_services[ansible_os_family] is defined
+  else  _samba_dc_enabled_services[ansible_distribution]
+
+_samba_dc_disabled_services:
+  Archlinux:
+    - systemd-resolved
+    - openresolv
+  Debian:
+    - smbd
+    - nmbd
+    - winbind
+    - resolvconf
+    - systemd-resolved
+  Fedora:
+    - systemd-resolved
+
+samba_dc_disabled_services: |
+  _samba_dc_disabled_services[ansible_os_family]
+  if    _samba_dc_disabled_services[ansible_os_family] is defined
+  else  _samba_dc_disabled_services[ansible_distribution]
+
+_samba_dc_resolv_conf:
+  Archlinux:
+    location: /etc/resolv.conf.head
+    services:
+      - openresolv
+  Debian:
+  Fedora:

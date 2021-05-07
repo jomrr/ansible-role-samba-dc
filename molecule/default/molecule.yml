@@ -1,0 +1,57 @@
+---
+# role: ansible-role-samba-dc
+# file: molecule/default/molecule.yml
+
+dependency:
+  name: galaxy
+  options:
+    role-file: requirements.yml
+driver:
+  name: vagrant
+  provider:
+    name: virtualbox
+    type: virtualbox
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+platforms:
+  - name: "samba-arch"
+    box: "archlinux/archlinux"
+    cpus: 2
+    memory: 2048
+  - name: samba-debian10
+    box: "debian/buster64"
+    cpus: 2
+    memory: 2048
+  - name: samba-debian11
+    box: "debian/bullseye64"
+    cpus: 2
+    memory: 2048
+  - name: samba-fedora
+    box: "fedora/33-cloud-base"
+    cpus: 2
+    memory: 2048
+  - name: samba-ubuntu
+    box: "ubuntu/focal64"
+    cpus: 2
+    memory: 2048
+provisioner:
+  name: ansible
+  log: true
+  playbooks:
+    prepare: prepare.yml
+    converge: converge.yml
+    verify: ../resources/playbooks/verify.yml
+  inventory:
+    group_vars:
+      all:
+        common_role_enabled: true
+        hosts_role_enabled: true
+        hosts_ip_static: true
+        hosts_domain: 'samdom.localdomain'
+        sysctl_enabled: true
+        samba_dc_role_enabled: true
+        samba_dc_dns_domain: 'samdom.localdomain'
+verifier:
+  name: ansible

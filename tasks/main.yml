@@ -1,0 +1,40 @@
+---
+# role: ansible-role-samba-dc
+# file: tasks/main.yml
+
+- name: "Tasks for ansible-role-samba-dc"
+  block:
+    - name: "Install packages for ansible-role-samba-dc"
+      package:
+        name: |
+          samba_dc_packages if samba_dc_dns_backend == "SAMBA_INTERNAL"
+          else samba_dc_packages + samba_dc_bind_packages
+        state: present
+
+    - name: "Disable conflicting services"
+      service:
+        name: "{{ item }}"
+        enabled: false
+        state: stopped
+      loop: "{{ samba_dc_disabled_services }}"
+
+    - name: "Systemd | Mask conflicting services"
+      systemd:
+        daemon_reload: true
+        name: "{{ item }}"
+        enabled: false
+        masked: true
+        state: stopped
+      loop: "{{ samba_dc_disabled_services }}"
+      when: ansible_service_mgr == 'systemd'
+
+    - name: "Systemd | Unmask required services"
+      systemd:
+        name: "{{ item }}"
+        masked: false
+      loop: "{{ samba_dc_enabled_services }}"
+      when: ansible_service_mgr == 'systemd'
+
+    - name: "Resolver | Include tasks for resolver configuration."
+      include_tasks: "resolver.yml"
+  when: samba_dc_role_enabled | bool

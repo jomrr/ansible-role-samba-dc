@@ -1,0 +1,70 @@
+---
+# role: ansible-role-samba-dc
+# file: tasks/dc.yml
+
+- name: "DC | Check if krb5.conf exists"
+  stat:
+    path: '/var/lib/samba/private/krb5.conf'
+  register: samba_dc_krb5
+
+- name: "DC | Remove /etc/samba/smb.conf if krb5.conf does not exists"
+  file:
+    path: '/etc/samba/smb.conf'
+    state: absent
+  when: not samba_dc_krb5.stat.exists | bool
+
+# - name: "DC | Alpine | Copy openrc-init-file for domain controller"
+#   template:
+#     src: "etc/init.d/samba.j2"
+#     dest: "/etc/init.d/samba"
+#     mode: '0755'
+#   when: ansible_os_family == 'Alpine'
+
+- name: "DC | Include tasks for resolv.conf configuration"
+  include_tasks: resolv.yml
+
+- name: "DC | Provision"
+  shell: >
+    samba-tool domain provision
+    --server-role=dc
+    --use-rfc2307
+    --dns-backend={{ samba_dc_dns_backend | upper }}
+    {{ '--site=' + (samba_dc_site | upper) if samba_site | length > 0 else '' }}
+    --realm={{ samba_dc_realm | upper }}
+    --domain={{ samba_dc_workgroup | upper }}
+    --adminpass={{ samba_dc_admin_password }}
+  args:
+    creates: '/var/lib/samba/private/krb5.conf'
+  # no_log: "{{ samba_dc_dc_no_log }}"
+
+- name: "DC | Write smb.conf"
+  template:
+    src: "etc/samba/smb.conf.{{ samba_dc_role }}.j2"
+    dest: "/etc/samba/smb.conf"
+    mode: 0640
+    validate: testparm -s %s
+  notify: restart samba
+
+- name: "DC | Copy Kerberos Configuration to /etc"
+  copy:
+    src: '/var/lib/samba/private/krb5.conf'
+    dest: '/etc/krb5.conf'
+    mode: 0644
+    remote_src: true
+
+#- name: "DC | Include tasks for AD DNS configuration"
+#  include_tasks: dns.yml
+
+- name: "DC | Disable expiry of Administrator account"
+  command: samba-tool user setexpiry Administrator --noexpiry
+  changed_when: false
+
+- name: "DC | Set default password expiration period and minimum length"
+  command: |
+    samba-tool domain passwordsettings set
+    --complexity={{ samba_dc_pwd_complexity }}
+    --min-pwd-age={{ samba_dc_pwd_min_age }}
+    --max-pwd-age={{ samba_dc_pwd_max_age }}
+    --min-pwd-length={{ samba_dc_pwd_min_len }}
+    --history-length={{ samba_dc_pwd_history_len }}
+  changed_when: false

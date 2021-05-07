@@ -1,0 +1,52 @@
+---
+# role: ansible-role-samba-dc
+# file: molecule/default/molecule.yml
+
+dependency:
+  name: galaxy
+  options:
+    role-file: requirements.yml
+driver:
+  name: docker
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+platforms:
+  - name: samba-dc
+    image: ${MOLECULE_IMG:-"jam82/molecule-debian:11"}
+    command: ""
+    pre_build_image: true
+    privileged: true
+    dns_servers:
+      - 172.17.0.2
+      - 9.9.9.9
+    etc_hosts: "{'samba-dc.test.lan': '172.17.0.2'}"
+    exposed_ports:
+      - '53'
+      - '135'
+      - '137/udp'
+      - '138/udp'
+      - '139'
+      - '389'
+      - '445'
+      - '464'
+      - '636'
+    tmpfs:
+      - /tmp
+      - /run
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+provisioner:
+  name: ansible
+  log: true
+  playbooks:
+    prepare: ../resources/playbooks/prepare.yml
+    converge: ../resources/playbooks/converge.yml
+    verify: ../resources/playbooks/verify.yml
+  inventory:
+    group_vars:
+      all:
+        samba_dc_role_enabled: true
+verifier:
+  name: ansible
