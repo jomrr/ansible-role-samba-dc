@@ -1,9 +1,0 @@
----
-# role: ansible-role-samba-dc-dc
-# file: handlers/main.yml
-
-- name: restart samba
-  service:
-    name: "{{ item }}"
-    state: restarted
-  loop: "{{ samba_dc_enabled_services[samba_role] }}"

@@ -4,37 +4,55 @@
 
 - name: "Tasks for ansible-role-samba-dc"
   block:
-    - name: "Install packages for ansible-role-samba-dc"
+    - name: "Assert | Preconditions"
+      include_tasks: assert.yml
+      tags:
+        - samba-dc:assert
+
+    - name: "Facts | Include tasks for derived facts"
+      include_tasks: facts.yml
+      tags:
+        - samba-dc:facts
+        - samba-dc:provision
+        - samba-dc:provision:smb.conf
+
+    - name: "Install | Packages for ansible-role-samba-dc"
       package:
-        name: |
-          samba_dc_packages if samba_dc_dns_backend == "SAMBA_INTERNAL"
-          else samba_dc_packages + samba_dc_bind_packages
+        name: >
+          {{ samba_dc_packages if samba_dc_dns_backend == "SAMBA_INTERNAL"
+          else samba_dc_packages + samba_dc_bind_packages }}
         state: present
+      tags:
+        - samba-dc:install
 
-    - name: "Disable conflicting services"
-      service:
-        name: "{{ item }}"
-        enabled: false
-        state: stopped
-      loop: "{{ samba_dc_disabled_services }}"
+    - name: "Services | Include tasks for services configuration"
+      include_tasks: services.yml
+      tags:
+        - samba-dc:services
 
-    - name: "Systemd | Mask conflicting services"
-      systemd:
-        daemon_reload: true
-        name: "{{ item }}"
-        enabled: false
-        masked: true
-        state: stopped
-      loop: "{{ samba_dc_disabled_services }}"
-      when: ansible_service_mgr == 'systemd'
+    - name: "Resolver | Write /etc/resolv.conf"
+      template:
+        src: etc/resolv.conf.j2
+        dest: /etc/resolv.conf
+        mode: 0644
+      tags:
+        - samba-dc:resolver
 
-    - name: "Systemd | Unmask required services"
-      systemd:
-        name: "{{ item }}"
-        masked: false
-      loop: "{{ samba_dc_enabled_services }}"
-      when: ansible_service_mgr == 'systemd'
+    - name: "Provision | Include tasks for provisioning"
+      include_tasks: provision.yml
+      when: samba_dc_provision | bool
+      tags:
+        - samba-dc:provision
+        - samba-dc:provision:krb5.conf
+        - samba-dc:provision:policy
+        - samba-dc:provision:restart
+        - samba-dc:provision:samba-tool
+        - samba-dc:provision:smb.conf
 
-    - name: "Resolver | Include tasks for resolver configuration."
-      include_tasks: "resolver.yml"
+    - name: "Provision | Include tasks for AD Join"
+      include_tasks: join.yml
+      when: not samba_dc_provision | bool
+      tags:
+        - samba-dc:join
+
   when: samba_dc_role_enabled | bool

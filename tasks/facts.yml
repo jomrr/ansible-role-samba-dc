@@ -1,0 +1,11 @@
+---
+# role: ansible-role-samba-dc
+# file: tasks/facts.yml
+
+- name: "Facts | Set facts derived from variables or other gathered facts"
+  set_fact:
+    samba_dc_workgroup: "{{ samba_dc_dns_domain | regex_replace('^(.*)\\.(.*)', '\\1') | upper }}"
+  tags:
+    - samba-dc:facts
+    - samba-dc:provision
+    - samba-dc:provision:smb.conf

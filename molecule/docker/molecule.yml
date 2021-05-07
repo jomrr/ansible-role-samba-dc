@@ -1,5 +1,5 @@
 ---
-# role: ansible-role-samba-dc
+# role: ansible-role-dc-samba-dc
 # file: molecule/default/molecule.yml
 
 dependency:
@@ -21,7 +21,7 @@ platforms:
     dns_servers:
       - 172.17.0.2
       - 9.9.9.9
-    etc_hosts: "{'samba-dc.test.lan': '172.17.0.2'}"
+    etc_hosts: "{'samba-dc.samdom.localdomain': '172.17.0.2'}"
     exposed_ports:
       - '53'
       - '135'
@@ -47,6 +47,14 @@ provisioner:
   inventory:
     group_vars:
       all:
+        common_role_enabled: true
+        hosts_role_enabled: true
+        hosts_ip_static: true
+        hosts_domain: 'samdom.localdomain'
+        sysctl_enabled: true
         samba_dc_role_enabled: true
+        samba_dc_domain_provision: true
+        samba_dc_dns_domain: 'samdom.localdomain'
+        samba_dc_site: 'MySite'
 verifier:
   name: ansible

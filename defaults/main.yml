@@ -6,19 +6,21 @@
 # Checked in tasks/main.yml which uses a tasks block if enabled.
 samba_dc_role_enabled: false
 
-# Set to true to provision a DC. To join a DC to an existing AD leave on false.
-samba_dc_domain_provision: false
+# Provision a DC or join an existing AD.
+# true = provision, false=join.
+# Set this to false, to join an additional DC to an AD Domain.
+samba_dc_provision: true
 
+# Location of the kerberos system keytab file.
+# If not empty, then the following smb.conf parameters are set:
+#   - kerberos method = secrets and keytab
+#   - dedicated keytab file = {{ samba_dc_keytab_file }}
+# Otherwise these parameters are omitted in smb.conf.
 samba_dc_keytab_file: "/etc/krb5.keytab"
 
-samba_dc_kerberos_method: "secrets and keytab"
-
-samba_dc_use_rfc2307: false
-
-# The group name of your ansible inventory for domain controllers.
-# Used to determine namesevers for resolv.conf on samba member servers,
-# because they should use existing domain controllers as their name servers.
-samba_dc_inventory_group_name: "dcs"
+# Use RFC2307 AD Schema Extensions / NIS Extensions.
+# see: https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller#Parameter_Explanation
+samba_dc_use_rfc2307: true
 
 # This uses the ansible fact ansible_domain as dns domain and realm by default.
 # Upper and lowercase conversion is done automatically as needed.
@@ -33,9 +35,6 @@ samba_dc_dns_domain: "{{ ansible_domain | default(ansible_hostname) }}"
 # see https://wiki.samba.org/index.php/Active_Directory_Sites.
 # AFFECTS: samba_dc_role=domain controller and samba_prvision=true.
 samba_dc_site: ""
-
-# Bind only to interfaces defined in list samba_dc_interfaces.
-samba_dc_bind_interfaces_only: true
 
 # Interfaces to bind to. NOTE: loopback must be included on DCs.
 samba_dc_interfaces: "{{ ansible_interfaces }}"
@@ -54,16 +53,29 @@ samba_dc_dns_backend: "SAMBA_INTERNAL"
 samba_dc_dns_forwarders:
   - "9.9.9.9"
 
-# Dictionary for smb.conf variables. This will override settings that
-# already exist, as it uses ansibles ini_file module.
+# Dictionary for smb.conf variables.
+# These will be added to the respective section in /etc/samba/smb.conf.
 # For existing settings see templates/smb.conf.j2.
-# STRUCTURE: { section1: { setting1: value1, setting2: ... }, { section2: ...} }
+# STRUCTURE: { section1: [ setting1, setting2, ...] }, { section2: [...] }
 # EXAMPLE:
 # samba_dc_smb_conf:
 #   global:
-#     bind_interfaces: no             #> this gets replaced, role default is yes
-#     template shell: /bin/bash       #> this is added
-#     template homedir: /home/%D/%U   #> this is added
+#     - "template shell = /bin/bash"
+#     - "template homedir = /home/%D/%U"
+#     - "tls enabled = yes"
+#     - "tls keyfile = /etc/samba/tls/dc1.samdom.localdomain.key"
+#     - "tls certfile = /etc/samba/tls/dc1.samdom.localdomain.crt"
+#     - "tls cafile = /etc/samba/tls/samdom_ca.crt"
+#     - "log level = 1 auth_json_audit:3@/var/log/samba/samba_audit.log"
+#     - "full_audit:failure = none"
+#     - "full_audit:success = pwrite write rename"
+#     - "full_audit:prefix = IP=%I|USER=%u|MACHINE=%m|VOLUME=%S"
+#     - "full_audit:facility = local7"
+#     - "full_audit:priority = NOTICE"
+#   netlogon:
+#     - "vfs objects = dfs_samba4, acl_xattr, full_audit"
+#   sysvol:
+#     - "vfs objects = dfs_samba4, acl_xattr, full_audit"
 samba_dc_smb_conf: {}
 
 # Password settings for domain.
@@ -72,9 +84,6 @@ samba_dc_pwd_min_age: 1
 samba_dc_pwd_max_age: 768
 samba_dc_pwd_min_len: 12
 samba_dc_pwd_history_len: 10
-
-# Enable authentication via keytab for GSSAPI Authentication
-samba_dc_keytab_enabled: true
 
 # Groups to create in AD.
 # Samba does not provide an automated mechanism of maintaining the

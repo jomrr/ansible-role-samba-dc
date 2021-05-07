@@ -1,0 +1,42 @@
+---
+# role: ansible-role-samba-dc-dc
+# file: tasks/services.yml
+
+# - name: "Services | Alpine | Create openrc-init file"
+#   template:
+#     src: "etc/init.d/samba.j2"
+#     dest: "/etc/init.d/samba"
+#     mode: 0755
+#   when: ansible_os_family == 'Alpine'
+#   tags:
+#     - samba-dc:services
+
+- name: "Services | Disable conflicting services"
+  service:
+    name: "{{ item }}"
+    enabled: false
+    state: stopped
+  loop: "{{ samba_dc_disabled_services }}"
+  tags:
+    - samba-dc:services
+
+- name: "Services | Systemd | Mask conflicting services"
+  systemd:
+    daemon_reload: true
+    name: "{{ item }}"
+    enabled: false
+    masked: true
+    state: stopped
+  loop: "{{ samba_dc_disabled_services }}"
+  when: ansible_service_mgr == 'systemd'
+  tags:
+    - samba-dc:services
+
+- name: "Services | Systemd | Unmask required services"
+  systemd:
+    name: "{{ item }}"
+    masked: false
+  loop: "{{ samba_dc_enabled_services }}"
+  when: ansible_service_mgr == 'systemd'
+  tags:
+    - samba-dc:services

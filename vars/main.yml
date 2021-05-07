@@ -34,10 +34,10 @@ _samba_dc_packages:
     - samba-dc
     - krb5-workstation
 
-samba_dc_packages: |
-  _samba_dc_packages[ansible_os_family]
+samba_dc_packages: >
+  {{ _samba_dc_packages[ansible_os_family]
   if    _samba_dc_packages[ansible_os_family] is defined
-  else  _samba_dc_packages[ansible_distribution]
+  else  _samba_dc_packages[ansible_distribution] }}
 
 _samba_dc_bind_packages:
   Archlinux:
@@ -47,42 +47,41 @@ _samba_dc_bind_packages:
   Fedora:
     - samba-dc-bind-dlz
 
-samba_dc_bind_packages: |
-  _samba_dc_bind_packages[ansible_os_family]
+samba_dc_bind_packages: >
+  {{ _samba_dc_bind_packages[ansible_os_family]
   if    _samba_dc_bind_packages[ansible_os_family] is defined
-  else  _samba_dc_bind_packages[ansible_distribution]
+  else  _samba_dc_bind_packages[ansible_distribution] }}
 
 _samba_dc_enabled_services:
   Archlinux:
-    - smb
-    - nmb
+    - samba
   Debian:
     - samba-ad-dc
   Fedora:
     - samba
 
-samba_dc_enabled_services: |
-  _samba_dc_enabled_services[ansible_os_family]
+samba_dc_enabled_services: >
+  {{ _samba_dc_enabled_services[ansible_os_family]
   if    _samba_dc_enabled_services[ansible_os_family] is defined
-  else  _samba_dc_enabled_services[ansible_distribution]
+  else  _samba_dc_enabled_services[ansible_distribution] }}
 
 _samba_dc_disabled_services:
   Archlinux:
+    - smb
+    - nmb
     - systemd-resolved
-    - openresolv
   Debian:
     - smbd
     - nmbd
     - winbind
-    - resolvconf
     - systemd-resolved
   Fedora:
     - systemd-resolved
 
-samba_dc_disabled_services: |
-  _samba_dc_disabled_services[ansible_os_family]
+samba_dc_disabled_services: >
+  {{ _samba_dc_disabled_services[ansible_os_family]
   if    _samba_dc_disabled_services[ansible_os_family] is defined
-  else  _samba_dc_disabled_services[ansible_distribution]
+  else  _samba_dc_disabled_services[ansible_distribution] }}
 
 _samba_dc_resolv_conf:
   Archlinux:

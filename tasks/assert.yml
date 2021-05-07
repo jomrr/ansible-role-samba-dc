@@ -1,0 +1,16 @@
+---
+# role: ansible-role-samba-dc
+# file: tasks/assert.yml
+
+- name: "Assert | Check that loopback interface in samba_dc_interfaces"
+  assert:
+    that: "'lo' in samba_dc_interfaces"
+  tags:
+    - samba-dc:assert
+
+- name: "Assert | Check that samba_dc_interfaces are present on target"
+  assert:
+    that: item in ansible_interfaces
+  loop: "{{ samba_dc_interfaces }}"
+  tags:
+    - samba-dc:assert
