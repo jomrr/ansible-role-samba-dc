@@ -2,74 +2,62 @@
 # role: ansible-role-samba-dc-dc
 # file: tasks/ad_dns.yml
 
-- name: "DNS | Start DC service"
-  service:
-    name: "{{ item }}"
-    state: started
-  loop: "{{ samba_dc_dc_enabled_services }}"
-
-- name: "DNS | Set facts for reverse DNS zone and PTR entry"
-  set_fact:
-    samba_dc_dns_reverse_zone: "{{ ansible_default_ipv4.address | ipaddr('revdns') | regex_replace('^([0-9]+)\\.(.*)\\.', '\\2') }}"
-    samba_dc_dns_reverse_ptr: "{{ ansible_default_ipv4.address | ipaddr('revdns') | regex_replace('\\.$', '') }}"
-  loop: "{{ samba_dc_interfaces - ['lo'] }}"
-
-- name: "DNS | Create reverse lookup zone"
-  shell: |
-    samba-tool dns zonecreate 127.0.0.1 \
-    {{ samba_dc_dns_reverse_zone }} \
-    --username=Administrator \
-    --password={{ samba_dc_dc_admin_password }}
+- name: "DNS | Create reverse lookup zones"
+  shell: >
+    unset HISTFILE;
+    samba-tool dns zonecreate 127.0.0.1 {{ item.zone }}
+    --username=Administrator
+    --password={{ samba_dc_admin_password }}
+  args:
+    executable: /bin/bash
+  loop: "{{ samba_dc_dns_reverse_zones }}"
   register: samba_dc_dns_result
-  changed_when: ("successfully" in samba_dc_dns_result.stdout)
+  changed_when: "'successfully' in samba_dc_dns_result.stdout"
   failed_when: samba_dc_dns_result.rc > 0
-    and not ( "ALREADY_EXISTS" in samba_dc_dns_result.stderr
-    or "already exists" in samba_dc_dns_result.stderr)
+    and not "ALREADY_EXISTS" in samba_dc_dns_result.stderr
+    and not "already exist" in samba_dc_dns_result.stderr
   no_log: "{{ samba_dc_dc_no_log }}"
+  tags:
+    - samba-dc:dns
 
-- name: "DNS | Create reverse lookup PTR entry for dc"
-  shell: |
-    samba-tool dns add 127.0.0.1 \
-    {{ samba_dc_dns_reverse_zone }} \
-    {{ samba_dc_dns_reverse_ptr }} PTR \
-    {{ ansible_hostname + '.' + samba_dc_realm | lower }} \
-    --username=Administrator \
-    --password={{ samba_dc_dc_admin_password }}
+- name: "DNS | Create reverse lookup PTR entries for DC"
+  shell: >
+    unset HISTFILE;
+    samba-tool dns add 127.0.0.1
+    {{ item.zone }} {{ item.ptr }} PTR
+    {{ samba_dc_fqdn | lower }}
+    --username=Administrator
+    --password={{ samba_dc_admin_password }}
+  args:
+    executable: /bin/bash
+  loop: "{{ samba_dc_dns_reverse_zones }}"
   register: samba_dc_dns_result
-  changed_when: ("successfully" in samba_dc_dns_result.stdout)
+  changed_when: "'successfully' in samba_dc_dns_result.stdout"
   failed_when: samba_dc_dns_result.rc > 0
-    and not ( "ALREADY_EXISTS" in samba_dc_dns_result.stderr
-    or "already exists" in samba_dc_dns_result.stderr)
+    and not "ALREADY_EXISTS" in samba_dc_dns_result.stderr
+    and not "already exist" in samba_dc_dns_result.stderr
   no_log: "{{ samba_dc_dc_no_log }}"
+  tags:
+    - samba-dc:dns
 
-- name: "DNS | Create kerberos UDP SRV global record for DC"
-  shell: |
-    samba-tool dns add 127.0.0.1 \
-    _msdcs.{{ samba_dc_realm }} \
-    _kerberos._udp.dc SRV \
-    "{{ ansible_hostname + '.' + samba_dc_realm | lower }} 88 0 100" \
+- name: "DNS | Create global and site-specific kerberos UDP SRV record for DC"
+  shell: >
+    unset HISTFILE;
+    samba-tool dns add 127.0.0.1 _msdcs.{{ samba_dc_dns_domain | lower }}
+    {{ item }}
     --username=Administrator \
-    --password={{ samba_dc_dc_admin_password }}
+    --password={{ samba_dc_admin_password }}
+  args:
+    executable: /bin/bash
+  loop:
+    - "_kerberos._udp.dc SRV \"{{ samba_dc_fqdn | lower }} 88 0 100\""
+    - "_kerberos._udp.{{ samba_dc_site | upper }}._sites.dc SRV \"{{ samba_dc_fqdn | lower }} 88 0 100\""
   register: samba_dc_dns_result
-  changed_when: ("successfully" in samba_dc_dns_result.stdout)
+  changed_when: "'successfully' in samba_dc_dns_result.stdout"
   failed_when: samba_dc_dns_result.rc > 0
-    and not ( "ALREADY_EXISTS" in samba_dc_dns_result.stderr
-    or "already exists" in samba_dc_dns_result.stderr)
-  when: samba_dc_dc_site_enabled
+    and not "ALREADY_EXISTS" in samba_dc_dns_result.stderr
+    and not "already exist" in samba_dc_dns_result.stderr
+  when: samba_dc_site | length > 0
   no_log: "{{ samba_dc_dc_no_log }}"
-
-- name: "DNS | Create kerberos UDP SRV site record for DC"
-  shell: |
-    samba-tool dns add 127.0.0.1 \
-    _msdcs.{{ samba_dc_realm }} \
-    _kerberos._udp.{{ samba_dc_dc_site | upper }}._sites.dc SRV \
-    "{{ ansible_hostname + '.' + samba_dc_realm | lower }} 88 0 100" \
-    --username=Administrator \
-    --password={{ samba_dc_dc_admin_password }}
-  register: samba_dc_dns_result
-  changed_when: ("successfully" in samba_dc_dns_result.stdout)
-  failed_when: samba_dc_dns_result.rc > 0
-    and not ( "ALREADY_EXISTS" in samba_dc_dns_result.stderr
-    or "already exists" in samba_dc_dns_result.stderr)
-  when: samba_dc_dc_site_enabled
-  no_log: "{{ samba_dc_dc_no_log }}"
+  tags:
+    - samba-dc:dns

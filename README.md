@@ -10,7 +10,9 @@
 
 ## Requirements
 
-Ansible 2.9 or higher.
+- Ansible 2.9 or higher
+- python-netaddr (Archlinux) installed on controller
+- python3-netaddr (Debian, Fedora, etc.) installed on controller
 
 ## Variables
 

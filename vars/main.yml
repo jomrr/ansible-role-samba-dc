@@ -11,6 +11,7 @@ _samba_dc_packages:
     - dnsutils
     - krb5
     - python-dnspython
+    - python-netaddr
     - openresolv
     - samba
   Debian:
@@ -20,6 +21,7 @@ _samba_dc_packages:
     - krb5-config
     - krb5-user
     - libpam-krb5
+    - python3-netaddr
     - samba
     - samba-dsdb-modules
     - samba-vfs-modules
@@ -29,6 +31,7 @@ _samba_dc_packages:
     - acl
     - attr
     - dnsutils
+    - python3-netaddr
     - samba
     - samba-client
     - samba-dc

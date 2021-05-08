@@ -1,0 +1,8 @@
+
+---
+# role: ansible-role-samba-dc
+# file: .ansible-lint
+
+skip_list:
+  - no-handler    # service needs to be restarted after config change, not at the end of play
+  - role-name     # a .gitignore file is obviously not a role...

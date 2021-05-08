@@ -12,6 +12,7 @@
     - name: "Facts | Include tasks for derived facts"
       include_tasks: facts.yml
       tags:
+        - samba-dc:dns
         - samba-dc:facts
         - samba-dc:provision
         - samba-dc:provision:smb.conf
@@ -55,4 +56,9 @@
       tags:
         - samba-dc:join
 
+    - name: "Provision | Include tasks setting DNS entries"
+      include_tasks: dns.yml
+      when: samba_dc_provision | bool
+      tags:
+        - samba-dc:dns
   when: samba_dc_role_enabled | bool

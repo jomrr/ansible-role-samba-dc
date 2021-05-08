@@ -9,37 +9,33 @@
   tasks:
     - name: "Update apk cache"
       apk:
-        update_cache: yes
+        update_cache: true
       when: ansible_pkg_mgr == "apk"
 
     - name: "Update apt cache and packages"
       apt:
         upgrade: full
-        update_cache: yes
+        update_cache: true
       when: ansible_pkg_mgr == "apt"
 
-    - name: "Update dnf cache and packages"
+    - name: "Update dnf cache"
       dnf:
-        name: "*"
-        state: latest
-        update_cache: yes
+        update_cache: true
       when: ansible_pkg_mgr == "dnf"
 
     - name: "Update pacman cache"
       pacman:
-        update_cache: yes
-        upgrade: yes
+        update_cache: true
+        upgrade: true
       when: ansible_pkg_mgr == "pacman"
 
     - name: "Update yum cache"
       yum:
-        name: "*"
-        state: latest
-        update_cache: yes
+        update_cache: true
       when: ansible_pkg_mgr == "yum"
 
     - name: "Update zypper cache"
       zypper:
         name: sudo
-        update_cache: yes
+        update_cache: true
       when: ansible_pkg_mgr == "zypper"
