@@ -16,6 +16,7 @@
         - samba-dc:facts
         - samba-dc:provision
         - samba-dc:provision:smb.conf
+        - samba-dc:resolver
 
     - name: "Install | Packages for ansible-role-samba-dc"
       package:
@@ -36,6 +37,7 @@
         src: etc/resolv.conf.j2
         dest: /etc/resolv.conf
         mode: 0644
+      when: not inside_container | bool
       tags:
         - samba-dc:resolver
 

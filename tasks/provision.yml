@@ -48,7 +48,7 @@
 
 # no handler, because we need to work with a running samba.
 # handlers are always triggered at the end of a play.
-- name: restart samba
+- name: "Provision | Restart samba service(s) if smb.conf chaged"
   service:
     name: "{{ item }}"
     state: restarted

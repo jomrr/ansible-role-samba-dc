@@ -8,6 +8,8 @@
   vars:
     baseline_role_enabled: false
     samba_dc_role_enabled: true
-  roles: # to enable required roles put them in requirements.yml and add here
-    # - baseline
+  roles:    # to enable required roles put them in requirements.yml and add here
+    - common
+    - hosts
+    - sysctl
     - role: '../ansible-role-samba-dc'

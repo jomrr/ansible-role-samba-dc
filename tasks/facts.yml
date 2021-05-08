@@ -12,6 +12,9 @@
 
 - name: "Facts | Set facts derived from variables or other gathered facts"
   set_fact:
+    inside_container: >-
+      {{ (  ansible_virtualization_role == 'guest'
+        and ansible_virtualization_type in ['docker', 'lxc', 'podman'] ) }}
     samba_dc_fqdn: "{{ ansible_hostname | lower }}.{{ samba_dc_dns_domain | lower }}"
     samba_dc_workgroup: "{{ samba_dc_dns_domain | regex_replace('^(.*)\\.(.*)', '\\1') | upper }}"
     samba_dc_dns_reverse_zones: |
@@ -27,6 +30,7 @@
     - samba-dc:facts
     - samba-dc:provision
     - samba-dc:provision:smb.conf
+    - samba-dc:resolver
 
 - name: "Debug DC DNS reverse zones"
   debug:
@@ -34,4 +38,11 @@
   loop: "{{ samba_dc_dns_reverse_zones }}"
   tags:
     - samba-dc:dns
+    - samba-dc:facts
+
+- name: "Debug inside_container"
+  debug:
+    msg: "{{ inside_container }}"
+  tags:
+    - samba-dc:resolver
     - samba-dc:facts
