@@ -50,13 +50,16 @@ samba_dc_admin_password: "Chang3MeN0w!"
 samba_dc_dns_backend: "SAMBA_INTERNAL"
 
 # DNS Forwarder on domain controllers.
+# Setting a public DNS Server here is not a good idea.
+# Use a local caching resolver instead to prevent flooding public dns servers
+# with local domain queries. dnsmasq is easy to setup for this.
 samba_dc_dns_forwarders:
   - "9.9.9.9"
 
 # Dictionary for smb.conf variables.
 # These will be added to the respective section in /etc/samba/smb.conf.
 # For existing settings see templates/smb.conf.j2.
-# STRUCTURE: { section1: [ setting1, setting2, ...] }, { section2: [...] }
+# STRUCTURE: { section1: [ "setting1", "setting2", ...] }, { section2: [...] }
 # EXAMPLE:
 # samba_dc_smb_conf:
 #   global:
