@@ -1,4 +1,5 @@
 ansible-lint
 flake8
 molecule-docker
+netaddr
 yamllint

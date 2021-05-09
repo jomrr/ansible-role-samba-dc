@@ -38,4 +38,5 @@ ignore: |
   .cache/
   .tox/
   .vscode/
+  .ansible-lint
   .travis.yml

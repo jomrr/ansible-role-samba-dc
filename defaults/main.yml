@@ -16,7 +16,7 @@ samba_dc_provision: true
 #   - kerberos method = secrets and keytab
 #   - dedicated keytab file = {{ samba_dc_keytab_file }}
 # Otherwise these parameters are omitted in smb.conf.
-samba_dc_keytab_file: "/etc/krb5.keytab"
+samba_dc_keytab: true
 
 # Use RFC2307 AD Schema Extensions / NIS Extensions.
 # see: https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller#Parameter_Explanation
@@ -29,7 +29,7 @@ samba_dc_use_rfc2307: true
 # workgroup = HOME
 # samba domain = HOME
 # see: https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller#Parameter_Explanation
-samba_dc_dns_domain: "{{ ansible_domain | default(ansible_hostname) }}"
+samba_dc_dns_domain: "{{ ansible_domain | default('samdom.localdomain') }}"
 
 # Enable an AD site,
 # see https://wiki.samba.org/index.php/Active_Directory_Sites.
@@ -84,27 +84,6 @@ samba_dc_pwd_min_age: 1
 samba_dc_pwd_max_age: 768
 samba_dc_pwd_min_len: 12
 samba_dc_pwd_history_len: 10
-
-# Groups to create in AD.
-# Samba does not provide an automated mechanism of maintaining the
-# gidNumber attribute, so you have to specify manually.
-samba_dc_groups: []
-# - name: test-group01
-#   gid: 10101
-#   members:
-#     - test01
-#     - test02
-
-# Users to create in AD.
-# Samba does not provide an automated mechanism of maintaining the
-# uidNumber attribute, so you have to specify manually.
-samba_dc_users: []
-# - name: test01
-#   uid: 10101
-#   password: Sup3rS@fe123!
-# - name: test02
-#   uid: 10102
-#   password: Sup3rS@fe123!
 
 # Set the no_log option, when using samba-tool with --username and --password
 samba_dc_no_log: true

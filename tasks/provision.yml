@@ -42,13 +42,25 @@
   args:
     creates: '/var/lib/samba/private/krb5.conf'
   no_log: "{{ samba_dc_dc_no_log }}"
+  register: _samba_dc_provision
   tags:
     - samba-dc:provision
     - samba-dc:provision:samba-tool
 
+- name: "Provision | Copy Kerberos Configuration to /etc"
+  copy:
+    src: '/var/lib/samba/private/krb5.conf'
+    dest: '/etc/krb5.conf'
+    mode: 0644
+    remote_src: true
+  when: _samba_dc_provision is changed
+  tags:
+    - samba-dc:provision
+    - samba-dc:provision:krb5.conf
+
 # no handler, because we need to work with a running samba.
 # handlers are always triggered at the end of a play.
-- name: "Provision | Restart samba service(s) if smb.conf chaged"
+- name: "Provision | Restart samba service(s) if smb.conf changed"
   service:
     name: "{{ item }}"
     state: restarted
@@ -58,19 +70,6 @@
     - samba-dc:provision
     - samba-dc:provision:restart
     - samba-dc:provision:smb.conf
-
-- name: "Provision | Copy Kerberos Configuration to /etc"
-  copy:
-    src: '/var/lib/samba/private/krb5.conf'
-    dest: '/etc/krb5.conf'
-    mode: 0644
-    remote_src: true
-  tags:
-    - samba-dc:provision
-    - samba-dc:provision:krb5.conf
-
-# - name: "Provision | Include tasks for AD DNS configuration"
-#   include_tasks: dns.yml
 
 - name: "Provision | Disable expiry of Administrator account"
   command: samba-tool user setexpiry Administrator --noexpiry

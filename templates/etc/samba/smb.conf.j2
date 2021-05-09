@@ -3,22 +3,18 @@
 # desc: managed by ansible
 # role: jam82.samba-dc
 # user: {{ ansible_user_id }}
-# date: {{ now() }}
 
 # Global parameters
 [global]
 {% if samba_dc_interfaces | length > 0 %}
     bind interfaces only = yes
 {% endif %}
-{% if samba_dc_keytab_file | length > 0 %}
-    dedicated keytab file = {{ samba_dc_keytab_file }}
-{% endif %}
     dns forwarder = {{ samba_dc_dns_forwarders | join(' ') }}
 {% if samba_dc_interfaces | length > 0 %}
     interfaces = {{ samba_dc_interfaces | join(' ') }}
 {% endif %}
     idmap_ldb:use rfc2307 = {{ samba_dc_use_rfc2307 | ternary('yes', 'no') }}
-{% if samba_dc_keytab_file | length > 0 %}
+{% if samba_dc_keytab | bool %}
     kerberos method = secrets and keytab
 {% endif %}
     netbios name = {{ ansible_hostname }}
