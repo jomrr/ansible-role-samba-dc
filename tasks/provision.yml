@@ -21,7 +21,7 @@
   template:
     src: "etc/samba/smb.conf.j2"
     dest: "/etc/samba/smb.conf"
-    mode: 0640
+    mode: 0644
     validate: testparm -s %s
   register: samba_dc_conf
   tags:
