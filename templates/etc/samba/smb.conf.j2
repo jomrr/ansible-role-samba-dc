@@ -2,6 +2,7 @@
 # vim:  set sw=4 ts=4 tw=4 et :
 # desc: managed by ansible
 # role: jam82.samba-dc
+# user: {{ ansible_user_id }}
 
 # Global parameters
 [global]
@@ -10,7 +11,7 @@
 {% endif %}
     dns forwarder = {{ samba_dc_dns_forwarders | join(' ') }}
 {% if samba_dc_interfaces | length > 0 %}
-    interfaces = {{ samba_dc_interfaces | join(' ') }}
+    interfaces = {{ samba_dc_interfaces | sort | join(' ') }}
 {% endif %}
     idmap_ldb:use rfc2307 = {{ samba_dc_use_rfc2307 | ternary('yes', 'no') }}
 {% if samba_dc_keytab | bool %}
