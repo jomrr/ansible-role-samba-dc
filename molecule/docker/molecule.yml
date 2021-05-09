@@ -37,7 +37,6 @@ platforms:
       - /run
     volumes:
       - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
-      - "/home/e01local/src/ansible/ansible-role-samba-dc/library:/opt:ro"
 provisioner:
   name: ansible
   log: true
@@ -54,7 +53,7 @@ provisioner:
         hosts_domain: 'samdom.localdomain'
         sysctl_role_enabled: true
         samba_dc_role_enabled: true
-        samba_dc_domain_provision: true
+        samba_dc_provision: true
         samba_dc_dns_domain: 'samdom.localdomain'
         samba_dc_site: 'MySite'
         samba_dc_admin_password: "Chang3MeN0w!"
