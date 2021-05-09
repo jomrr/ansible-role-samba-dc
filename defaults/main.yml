@@ -1,27 +1,3 @@
-# ansible-role-samba-dc
-
-![GitHub](https://img.shields.io/github/license/jam82/ansible-role-samba-dc) [![Build Status](https://travis-ci.org/jam82/ansible-role-samba-dc.svg?branch=main)](https://travis-ci.org/jam82/ansible-role-samba-dc)
-
-**Ansible role for setting up samba as active directory domain controller.**
-
-## Supported Platforms
-
-- Debian 10, 11
-- Fedora 32, 33
-- Ubuntu 18.04, 20.04
-
-## Requirements
-
-- Ansible 2.9 or higher
-- python netaddr on ansible controller
-
-## Variables
-
-Variables and defaults for this role.
-
-### defaults/main.yml
-
-```yaml
 ---
 # role: ansible-role-samba-dc
 # file: defaults/main.yml
@@ -75,15 +51,15 @@ samba_dc_dns_backend: "SAMBA_INTERNAL"
 
 # DNS Forwarder on domain controllers.
 # Setting a public DNS Server here is not a good idea.
-# Use a local caching resolver instead to prevent flooding public dns servers with local domain queries.
-# dnsmasq is easy to setup for this.
+# Use a local caching resolver instead to prevent flooding public dns servers
+# with local domain queries. dnsmasq is easy to setup for this.
 samba_dc_dns_forwarders:
   - "9.9.9.9"
 
 # Dictionary for smb.conf variables.
 # These will be added to the respective section in /etc/samba/smb.conf.
 # For existing settings see templates/smb.conf.j2.
-# STRUCTURE: { section1: [ setting1, setting2, ...] }, { section2: [...] }
+# STRUCTURE: { section1: [ "setting1", "setting2", ...] }, { section2: [...] }
 # EXAMPLE:
 # samba_dc_smb_conf:
 #   global:
@@ -114,54 +90,3 @@ samba_dc_pwd_history_len: 10
 
 # Set the no_log option, when using samba-tool with --username and --password
 samba_dc_no_log: true
-```
-
-## Dependencies
-
-### ansible-role-hosts
-
-Ensure with `hosts_ip_static: true` that the `127.0.1.1` dhcp pseudo-address from `/etc/hosts` gets replaced with the current ip addresses.
-
-Also set `hosts_domain: 'samdom.localdomain'` so `hostname -f` shows the hosts fqdn.
-
->If you have a working dns setup already, you can skip this dependency.
-
-## Example Playbook
-
-```yaml
----
-# role: ansible-role-samba-dc
-# file: site.yml
-
-- hosts: samba_dcs
-  become: true
-  gather_facts: true
-  vars:
-    hosts_role_enabled: true
-    # set current ip addresses for hosts interfaces
-    hosts_ip_static: true
-    # set dns domain, if dns is not configured
-    hosts_domain: 'samdom.localdomain'
-    samba_dc_role_enabled: true
-    samba_dc_dns_domain: 'samdom.localdomain'
-  roles:
-    - role: ansible-role-samba-dc
-```
-
-## License and Author
-
-- Author:: [jam82](https://github.com/jam82/)
-- Copyright:: 2021, [jam82](https://github.com/jam82/)
-
-Licensed under [MIT License](https://opensource.org/licenses/MIT).
-See [LICENSE](https://github.com/jam82/ansible-role-samba-dc/blob/master/LICENSE) file in repository.
-
-## References
-
-- [ArchWiki - Samba/Active Directory domain controller](https://wiki.archlinux.org/title/Samba/Active_Directory_domain_controller)
-
-- [SambaWiki](https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller)
-
-- [oO.o’s Fedora 30 Samba AD DC Guide](https://forum.level1techs.com/t/oo-os-fedora-30-samba-ad-dc-guide/149475)
-
-- [Tranquil.it](https://dev.tranquil.it/samba/en/samba_config_server/samba_active_directory_conf.html)

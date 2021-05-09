@@ -1,0 +1,12 @@
+---
+# playbook: samba-dc
+# file: test/main.yml
+
+- hosts: all
+  become: true
+  gather_facts: true
+  roles:
+    - common
+    - hosts
+    - sysctl
+    - '../../ansible-role-samba-dc'

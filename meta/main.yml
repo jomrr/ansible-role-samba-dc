@@ -1,0 +1,42 @@
+---
+# role: ansible-role-samba-dc
+# file: meta/main.yml
+
+galaxy_info:
+  role_name: samba
+  author: jam82
+  description: Ansible role for setting up samba.
+  company: ''
+
+  # If the issue tracker for your role is not on github, uncomment the
+  # next line and provide a value
+  issue_tracker_url: https://github.com/jam82/ansible-role-samba-dc/issues
+
+  license: MIT
+
+  min_ansible_version: "2.9"
+
+  # If this a Container Enabled role, provide the minimum Ansible Container version.
+  # min_ansible_container_version:
+
+  github_branch: main
+
+  # platforms is a list of platforms, and each platform has a name and a list of versions.
+  #
+  platforms:
+    - name: ArchLinux
+      versions:
+        - any
+    - name: Debian
+      versions:
+        - any
+    - name: Fedora
+      versions:
+        - any
+    - name: Ubuntu
+      versions:
+        - any
+
+  galaxy_tags: []
+
+dependencies: []

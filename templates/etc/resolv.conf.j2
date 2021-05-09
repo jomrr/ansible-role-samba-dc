@@ -1,0 +1,14 @@
+# {{ template_destpath }}
+# vim: set sw=4 ts=4 tw=4 et :
+# managed by ansible role: jam82.samba-dc
+
+domain {{ samba_dc_dns_domain | lower }}
+search {{ samba_dc_dns_domain | lower }}
+nameserver 127.0.0.1
+{% for nameserver in samba_dc_dns_forwarders %}
+{%  if loop.index <= 2 %}
+{%      if nameserver is defined %}
+nameserver {{ nameserver }}
+{%      endif %}
+{%  endif %}
+{% endfor %}

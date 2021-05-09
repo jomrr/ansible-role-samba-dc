@@ -1,0 +1,66 @@
+---
+# role: ansible-role-samba-dc
+# file: tasks/main.yml
+
+- name: "Tasks for ansible-role-samba-dc"
+  block:
+    - name: "Assert | Preconditions"
+      include_tasks: assert.yml
+      tags:
+        - samba-dc:assert
+
+    - name: "Facts | Include tasks for derived facts"
+      include_tasks: facts.yml
+      tags:
+        - samba-dc:dns
+        - samba-dc:facts
+        - samba-dc:provision
+        - samba-dc:provision:smb.conf
+        - samba-dc:resolver
+
+    - name: "Install | Packages for ansible-role-samba-dc"
+      package:
+        name: >
+          {{ samba_dc_packages if samba_dc_dns_backend == "SAMBA_INTERNAL"
+          else samba_dc_packages + samba_dc_bind_packages }}
+        state: present
+      tags:
+        - samba-dc:install
+
+    - name: "Services | Include tasks for services configuration"
+      include_tasks: services.yml
+      tags:
+        - samba-dc:services
+
+    - name: "Resolver | Write /etc/resolv.conf"
+      template:
+        src: etc/resolv.conf.j2
+        dest: /etc/resolv.conf
+        mode: 0644
+      when: not inside_container | bool
+      tags:
+        - samba-dc:resolver
+
+    - name: "Provision | Include tasks for provisioning"
+      include_tasks: provision.yml
+      when: samba_dc_provision | bool
+      tags:
+        - samba-dc:provision
+        - samba-dc:provision:krb5.conf
+        - samba-dc:provision:policy
+        - samba-dc:provision:restart
+        - samba-dc:provision:samba-tool
+        - samba-dc:provision:smb.conf
+
+    - name: "Provision | Include tasks for AD Join"
+      include_tasks: join.yml
+      when: not samba_dc_provision | bool
+      tags:
+        - samba-dc:join
+
+    - name: "Provision | Include tasks setting DNS entries"
+      include_tasks: dns.yml
+      when: samba_dc_provision | bool
+      tags:
+        - samba-dc:dns
+  when: samba_dc_role_enabled | bool

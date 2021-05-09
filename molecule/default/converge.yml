@@ -1,0 +1,13 @@
+---
+# role: ansible-role-samba-dc
+# file: molecule/default/converge.yml
+
+- name: Converge
+  hosts: all
+  become: true
+  gather_facts: true
+  roles:  # to enable required roles put them in requirements.yml and add here
+    - common
+    - hosts
+    - sysctl
+    - role: '../ansible-role-samba-dc'

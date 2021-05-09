@@ -1,0 +1,77 @@
+---
+# role: ansible-role-dc-samba-dc
+# file: molecule/default/molecule.yml
+
+dependency:
+  name: galaxy
+  options:
+    role-file: requirements.yml
+driver:
+  name: docker
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+platforms:
+  - name: samba-dc
+    image: ${MOLECULE_IMG:-"jam82/molecule-debian:11"}
+    command: ""
+    pre_build_image: true
+    privileged: true
+    dns_servers:
+      - 127.0.0.1
+      - 9.9.9.9
+    etc_hosts: "{'samba-dc.samdom.localdomain': '172.17.0.2'}"
+    exposed_ports:
+      - '53'
+      - '135'
+      - '137/udp'
+      - '138/udp'
+      - '139'
+      - '389'
+      - '445'
+      - '464'
+      - '636'
+    tmpfs:
+      - /tmp
+      - /run
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+      - "/home/e01local/src/ansible/ansible-role-samba-dc/library:/opt:ro"
+provisioner:
+  name: ansible
+  log: true
+  playbooks:
+    prepare: ../resources/playbooks/prepare.yml
+    converge: ../resources/playbooks/converge.yml
+    verify: ../resources/playbooks/verify.yml
+  inventory:
+    group_vars:
+      all:
+        common_role_enabled: true
+        hosts_role_enabled: true
+        hosts_ip_static: true
+        hosts_domain: 'samdom.localdomain'
+        sysctl_role_enabled: true
+        samba_dc_role_enabled: true
+        samba_dc_domain_provision: true
+        samba_dc_dns_domain: 'samdom.localdomain'
+        samba_dc_site: 'MySite'
+        samba_dc_admin_password: "Chang3MeN0w!"
+        samba_dc_dc_no_log: false
+        samba_dc_smb_conf:
+          global:
+            - "template shell = /bin/bash"
+            - "template homedir = /home/%D/%U"
+            - "log level = 1 auth_json_audit:3@/var/log/samba/samba_audit.log"
+            - "full_audit:failure = none"
+            - "full_audit:success = pwrite write rename"
+            - "full_audit:prefix = IP=%I|USER=%u|MACHINE=%m|VOLUME=%S"
+            - "full_audit:facility = local7"
+            - "full_audit:priority = NOTICE"
+          netlogon:
+            - "vfs objects = dfs_samba4, acl_xattr, full_audit"
+          sysvol:
+            - "vfs objects = dfs_samba4, acl_xattr, full_audit"
+verifier:
+  name: ansible

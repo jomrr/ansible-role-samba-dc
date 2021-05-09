@@ -1,0 +1,15 @@
+---
+# playbook: packer templates
+# file: ansible/requirements.yml
+
+- src: https://github.com/jam82/ansible-role-common
+  name: common
+  version: main
+
+- src: https://github.com/jam82/ansible-role-hosts
+  name: hosts
+  version: main
+
+- src: https://github.com/jam82/ansible-role-sysctl
+  name: sysctl
+  version: main
