@@ -18,6 +18,20 @@ platforms:
     command: ${MOLECULE_IMG_CMD:-""}
     pre_build_image: true
     privileged: true
+    dns_servers:
+      - 127.0.0.1
+      - 9.9.9.9
+    etc_hosts: "{'dctox.samdom.localdomain': '172.17.0.2'}"
+    exposed_ports:
+      - '53'
+      - '135'
+      - '137/udp'
+      - '138/udp'
+      - '139'
+      - '389'
+      - '445'
+      - '464'
+      - '636'
     tmpfs:
       - /tmp
       - /run
