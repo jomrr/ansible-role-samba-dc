@@ -14,8 +14,6 @@
 
 - Ansible 2.9 or higher
 - python netaddr on ansible controller
-  - python-netaddar (Archlinux)
-  - python3-netaddr (Debian, Fedora, Ubuntu)
 
 ## Variables
 
