@@ -43,7 +43,6 @@
 
     - name: "Provision | Include tasks for provisioning"
       include_tasks: provision.yml
-      when: samba_dc_provision | bool
       tags:
         - samba-dc:provision
         - samba-dc:provision:krb5.conf
@@ -60,7 +59,6 @@
 
     - name: "Provision | Include tasks setting DNS entries"
       include_tasks: dns.yml
-      when: samba_dc_provision | bool
       tags:
         - samba-dc:dns
   when: samba_dc_role_enabled | bool

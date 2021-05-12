@@ -14,7 +14,7 @@
   set_fact:
     inside_container: >-
       {{ (  ansible_virtualization_role == 'guest'
-        and ansible_virtualization_type in ['docker', 'lxc', 'podman'] ) }}
+        and ansible_virtualization_type in ['container', 'docker', 'lxc'] ) }}
     samba_dc_fqdn: "{{ ansible_hostname | lower }}.{{ samba_dc_dns_domain | lower }}"
     samba_dc_workgroup: "{{ samba_dc_dns_domain | regex_replace('^(.*)\\.(.*)', '\\1') | upper }}"
     samba_dc_dns_reverse_zones: |
@@ -34,7 +34,7 @@
 
 - name: "Debug DC DNS reverse zones"
   debug:
-    msg: "Zone: {{ item.zone }}, Address: {{ item.ptr }}"
+    msg: "Zone: {{ item.zone }}, PTR Record: {{ item.ptr }}"
   loop: "{{ samba_dc_dns_reverse_zones }}"
   tags:
     - samba-dc:dns

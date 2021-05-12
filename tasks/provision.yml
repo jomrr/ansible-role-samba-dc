@@ -29,11 +29,11 @@
     - samba-dc:provision:smb.conf
 
 # CHECK: Archlinux was missing LD_LIBRARY_PATH for libicui18n.so.69.
-- name: "Provision | DC Provisioning"
+- name: "Provision | DC Provisioning new AD Forest"
   shell: >
     LD_LIBRARY_PATH="/usr/lib" samba-tool domain provision
     --server-role=dc
-    --use-rfc2307
+    {{ '--use-rfc2307' if samba_dc_rfc2307 | bool }}
     --dns-backend={{ samba_dc_dns_backend | upper }}
     {{ '--site=' + samba_dc_site if samba_dc_site | length > 0 else '' }}
     --realm={{ samba_dc_dns_domain | upper }}
@@ -43,10 +43,31 @@
     creates: '/var/lib/samba/private/krb5.conf'
   no_log: "{{ samba_dc_dc_no_log }}"
   register: _samba_dc_provision
+  when: samba_dc_provision | bool
   tags:
     - samba-dc:provision
     - samba-dc:provision:samba-tool
 
+- name: "Provision | DC Join to existing AD Forest"
+  shell: >
+    LD_LIBRARY_PATH="/usr/lib" samba-tool domain join
+    {{ samba_dc_dns_domain | lower }} DC
+    --dns-backend={{ samba_dc_dns_backend | upper }}
+    {{ '--site=' + samba_dc_site if samba_dc_site | length > 0 else '' }}
+    --realm={{ samba_dc_dns_domain | lower }}
+    --username="{{ samba_dc_workgroup }}\administrator"
+    --password={{ samba_dc_admin_password }}
+  args:
+    creates: '/var/lib/samba/private/krb5.conf'
+  no_log: "{{ samba_dc_dc_no_log }}"
+  register: _samba_dc_join
+  when: not samba_dc_provision | bool
+  tags:
+    - samba-dc:provision
+    - samba-dc:provision:samba-tool
+
+# no handler, because we need to work with a running samba.
+# handlers are always triggered at the end of a play.
 - name: "Provision | Copy Kerberos Configuration to /etc"
   copy:
     src: '/var/lib/samba/private/krb5.conf'
@@ -54,12 +75,12 @@
     mode: 0644
     remote_src: true
   when: _samba_dc_provision is changed
+    or _samba_dc_join is changed
   tags:
     - samba-dc:provision
     - samba-dc:provision:krb5.conf
 
-# no handler, because we need to work with a running samba.
-# handlers are always triggered at the end of a play.
+# no handler, because we need to work with a running samba...
 - name: "Provision | Restart samba service(s) if smb.conf changed"
   service:
     name: "{{ item }}"

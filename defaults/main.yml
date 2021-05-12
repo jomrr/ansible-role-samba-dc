@@ -20,7 +20,7 @@ samba_dc_keytab: true
 
 # Use RFC2307 AD Schema Extensions / NIS Extensions.
 # see: https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller#Parameter_Explanation
-samba_dc_use_rfc2307: true
+samba_dc_rfc2307: true
 
 # This uses the ansible fact ansible_domain as dns domain and realm by default.
 # Upper and lowercase conversion is done automatically as needed.
