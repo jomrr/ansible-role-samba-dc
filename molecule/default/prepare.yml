@@ -6,6 +6,10 @@
   hosts: all
   become: true
   gather_facts: true
+  roles:  # to enable required roles put them in requirements.yml and add here
+    - common
+    - hosts
+    - sysctl
   tasks:
     - name: "Update apk cache"
       apk:

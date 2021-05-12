@@ -5,8 +5,5 @@
 - name: Converge
   hosts: all
   become: true
-  roles:    # to enable required roles put them in requirements.yml and add here
-    - common
-    - hosts
-    - sysctl
+  roles:
     - role: '../ansible-role-samba-dc'

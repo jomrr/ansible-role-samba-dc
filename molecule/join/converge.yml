@@ -6,9 +6,6 @@
   hosts: all
   become: true
   gather_facts: true
-  serial: 1 # provision one instance at a time, so dc1 is ready for dc2 to join
-  roles:    # to enable required roles put them in requirements.yml and add here
-    - common
-    - hosts
-    - sysctl
+  serial: 1  # provision one instance at a time, so dc1 is ready for dc2 to join
+  roles:
     - role: '../ansible-role-samba-dc'
