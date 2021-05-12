@@ -21,7 +21,7 @@ platforms:
     dns_servers:
       - 127.0.0.1
       - 9.9.9.9
-    etc_hosts: "{'samba-dc.samdom.localdomain': '172.17.0.2'}"
+    etc_hosts: "{'dc1.samdom.localdomain': '172.17.0.2', 'dc2.samdom.localdomain': '172.17.0.3'}"
     exposed_ports:
       - '53'
       - '135'
@@ -47,7 +47,7 @@ platforms:
     dns_servers:
       - 172.17.0.2
       - 9.9.9.9
-    etc_hosts: "{'samba-dc.samdom.localdomain': '172.17.0.2'}"
+    etc_hosts: "{'dc1.samdom.localdomain': '172.17.0.2', 'dc2.samdom.localdomain': '172.17.0.3'}"
     exposed_ports:
       - '53'
       - '135'
