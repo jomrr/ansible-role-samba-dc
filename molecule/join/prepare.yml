@@ -1,6 +1,6 @@
 ---
 # role: ansible-role-samba-dc
-# file: molecule/default/prepare.yml
+# file: molecule/dev/prepare.yml
 
 - name: Prepare
   hosts: all
@@ -10,15 +10,18 @@
     - common
     - hosts
     - sysctl
+  vars:
+    pip_packages:
+      - ansible
+      - cryptography
   tasks:
     - name: "Update apk cache"
       apk:
         update_cache: true
       when: ansible_pkg_mgr == "apk"
 
-    - name: "Update apt cache and packages"
+    - name: "Update apt cache"
       apt:
-        upgrade: full
         update_cache: true
       when: ansible_pkg_mgr == "apt"
 
@@ -30,7 +33,6 @@
     - name: "Update pacman cache"
       pacman:
         update_cache: true
-        upgrade: true
       when: ansible_pkg_mgr == "pacman"
 
     - name: "Update yum cache"
@@ -43,3 +45,28 @@
         name: sudo
         update_cache: true
       when: ansible_pkg_mgr == "zypper"
+
+    - name: "Install Debian development"
+      block:
+        - name: "Upgrade all"
+          apt:
+            upgrade: full
+        - name: "install pip"
+          apt:
+            name: python3-pip
+        - name: "pip ansible"
+          pip:
+            name: "{{ item }}"
+          loop: "{{ pip_packages }}"
+      when: ansible_pkg_mgr == "apt"
+
+    - name: "Install Fedora development"
+      block:
+        - name: "Install python-pip"
+          dnf:
+            name: python3-pip
+        - name: "Install pip packages"
+          pip:
+            name: "{{ item }}"
+          loop: "{{ pip_packages }}"
+      when: ansible_pkg_mgr == "dnf"

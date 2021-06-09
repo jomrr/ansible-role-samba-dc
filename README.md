@@ -6,8 +6,9 @@
 
 ## Supported Platforms
 
+- Archlinux
 - Debian 10, 11
-- Fedora 32, 33
+- Fedora 33, 34
 - Ubuntu 18.04, 20.04
 
 ## Requirements
@@ -22,6 +23,7 @@ Variables and defaults for this role.
 ### defaults/main.yml
 
 ```yaml
+---
 ---
 # role: ansible-role-samba-dc
 # file: defaults/main.yml
@@ -44,7 +46,7 @@ samba_dc_keytab: true
 
 # Use RFC2307 AD Schema Extensions / NIS Extensions.
 # see: https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller#Parameter_Explanation
-samba_dc_use_rfc2307: true
+samba_dc_rfc2307: true
 
 # This uses the ansible fact ansible_domain as dns domain and realm by default.
 # Upper and lowercase conversion is done automatically as needed.
@@ -73,17 +75,23 @@ samba_dc_admin_password: "Chang3MeN0w!"
 # see: https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller#Setting_up_the_AD_DNS_back_end
 samba_dc_dns_backend: "SAMBA_INTERNAL"
 
+# Additional Nameserver used in /etc/resolv.conf, must be another DC or empty.
+# Add DC Master here, if you JOIN an additional DC.
+samba_dc_nameserver: ""
+
 # DNS Forwarder on domain controllers.
 # Setting a public DNS Server here is not a good idea.
-# Use a local caching resolver instead to prevent flooding public dns servers with local domain queries.
-# dnsmasq is easy to setup for this.
+# Use a local caching resolver instead to prevent flooding public dns servers
+# with local domain queries. dnsmasq is easy to setup for this.
+# The first entry also gets added to /etc/resolv.conf as a fallback,
+# the rest goes to smb.confs dns_forwarders setting.
 samba_dc_dns_forwarders:
   - "9.9.9.9"
 
 # Dictionary for smb.conf variables.
 # These will be added to the respective section in /etc/samba/smb.conf.
 # For existing settings see templates/smb.conf.j2.
-# STRUCTURE: { section1: [ setting1, setting2, ...] }, { section2: [...] }
+# STRUCTURE: { section1: [ "setting1", "setting2", ...] }, { section2: [...] }
 # EXAMPLE:
 # samba_dc_smb_conf:
 #   global:

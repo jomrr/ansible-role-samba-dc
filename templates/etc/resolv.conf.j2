@@ -1,14 +1,18 @@
 # {{ template_destpath }}
 # vim: set sw=4 ts=4 tw=4 et :
-# managed by ansible role: jam82.samba-dc
+# role: jam82.samba-dc
+# user: {{ ansible_user_id }}
 
 domain {{ samba_dc_dns_domain | lower }}
 search {{ samba_dc_dns_domain | lower }}
 nameserver 127.0.0.1
-{% for nameserver in samba_dc_dns_forwarders %}
-{%  if loop.index <= 2 %}
-{%      if nameserver is defined %}
-nameserver {{ nameserver }}
+{% if samba_dc_nameserver | default('')  | length > 0 %}
+nameserver {{ samba_dc_nameserver }}
+{% endif %}
+{% for forwarder in samba_dc_dns_forwarders %}
+{%  if loop.index == 1 %}
+{%      if forwarder is defined %}
+nameserver {{ forwarder }}
 {%      endif %}
 {%  endif %}
 {% endfor %}
