@@ -62,10 +62,6 @@
 
     - name: "Install Fedora development"
       block:
-        - name: "Upgrade all"
-          dnf:
-            name: "*"
-            state: latest
         - name: "Install python-pip"
           dnf:
             name: python3-pip
