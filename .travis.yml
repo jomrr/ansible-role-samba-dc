@@ -4,29 +4,18 @@
 
 language: python
 
-python:
-  - "3.9"
-
-services: docker
+os: linux
+dist: focal
 
 branches:
   only:
     - main
 
-env:
-  jobs:
-    - TOX_IMG="Arch"      TOX_ANSIBLE="{209,210,211}"
-    - TOX_IMG="Debian"    TOX_ANSIBLE="{209,210,211}"
-    - TOX_IMG="Fedora"    TOX_ANSIBLE="{209,210,211}"
-    - TOX_IMG="Ubuntu"    TOX_ANSIBLE="{209,210,211}"
-
 before_install:
   - python -m pip install --upgrade pip
 
 install:
-  - pip install tox-travis
+  - pip install ansible yamllint ansible-lint
 
 script:
-  - tox -e $(echo py${TRAVIS_PYTHON_VERSION} | tr -d .)-an${TOX_ANSIBLE}-${TOX_IMG}
-  - rm -r .tox/py*/log/*
-  - find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
+  - ansible-lint
