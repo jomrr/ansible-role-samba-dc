@@ -7,7 +7,7 @@
     unset HISTFILE;
     samba-tool dns zonecreate 127.0.0.1 {{ item.zone }}
     --username=Administrator
-    --password={{ samba_dc_admin_password }}
+    --password='{{ samba_dc_admin_password }}'
   args:
     executable: /bin/bash
   loop: "{{ samba_dc_dns_reverse_zones }}"
@@ -27,7 +27,7 @@
     {{ item.zone }} {{ item.ptr }} PTR
     {{ samba_dc_fqdn | lower }}
     --username=Administrator
-    --password={{ samba_dc_admin_password }}
+    --password='{{ samba_dc_admin_password }}'
   args:
     executable: /bin/bash
   loop: "{{ samba_dc_dns_reverse_zones }}"
@@ -46,7 +46,7 @@
     samba-tool dns add 127.0.0.1 _msdcs.{{ samba_dc_dns_domain | lower }}
     {{ item }}
     --username=Administrator \
-    --password={{ samba_dc_admin_password }}
+    --password='{{ samba_dc_admin_password }}'
   args:
     executable: /bin/bash
   loop:
