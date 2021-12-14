@@ -1,5 +1,5 @@
 ---
-# role: ansible-role-dc_dc
+# role: ansible-role-dc
 # file: molecule/default/molecule.yml
 
 dependency:
@@ -56,7 +56,7 @@ provisioner:
         samba_dc_dns_domain: 'samdom.localdomain'
         samba_dc_site: 'MySite'
         samba_dc_admin_password: "Chang3MeN0w!"
-        samba_dc_dc_no_log: false
+        samba_dc_no_log: false
         samba_dc_smb_conf:
           global:
             - "template shell = /bin/bash"

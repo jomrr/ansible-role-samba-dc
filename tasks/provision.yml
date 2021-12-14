@@ -41,7 +41,7 @@
     --adminpass={{ samba_dc_admin_password }}
   args:
     creates: '/var/lib/samba/private/krb5.conf'
-  no_log: "{{ samba_dc_dc_no_log }}"
+  no_log: "{{ samba_dc_no_log }}"
   register: _samba_dc_provision
   when: samba_dc_provision | bool
   tags:
@@ -59,7 +59,7 @@
     --password={{ samba_dc_admin_password }}
   args:
     creates: '/var/lib/samba/private/krb5.conf'
-  no_log: "{{ samba_dc_dc_no_log }}"
+  no_log: "{{ samba_dc_no_log }}"
   register: _samba_dc_join
   when: not samba_dc_provision | bool
   tags:

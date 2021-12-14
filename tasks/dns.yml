@@ -16,7 +16,7 @@
   failed_when: samba_dc_dns_result.rc > 0
     and not "ALREADY_EXISTS" in samba_dc_dns_result.stderr
     and not "already exist" in samba_dc_dns_result.stderr
-  no_log: "{{ samba_dc_dc_no_log }}"
+  no_log: "{{ samba_dc_no_log }}"
   tags:
     - samba-dc:dns
 
@@ -36,7 +36,7 @@
   failed_when: samba_dc_dns_result.rc > 0
     and not "ALREADY_EXISTS" in samba_dc_dns_result.stderr
     and not "already exist" in samba_dc_dns_result.stderr
-  no_log: "{{ samba_dc_dc_no_log }}"
+  no_log: "{{ samba_dc_no_log }}"
   tags:
     - samba-dc:dns
 
@@ -58,6 +58,6 @@
     and not "ALREADY_EXISTS" in samba_dc_dns_result.stderr
     and not "already exist" in samba_dc_dns_result.stderr
   when: samba_dc_site | length > 0
-  no_log: "{{ samba_dc_dc_no_log }}"
+  no_log: "{{ samba_dc_no_log }}"
   tags:
     - samba-dc:dns
