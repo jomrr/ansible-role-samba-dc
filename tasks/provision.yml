@@ -38,10 +38,10 @@
     {{ '--site=' + samba_dc_site if samba_dc_site | length > 0 else '' }}
     --realm={{ samba_dc_dns_domain | upper }}
     --domain={{ samba_dc_workgroup | upper }}
-    --adminpass={{ samba_dc_admin_password }}
+    --adminpass='{{ samba_dc_admin_password }}'
   args:
     creates: '/var/lib/samba/private/krb5.conf'
-  no_log: "{{ samba_dc_dc_no_log }}"
+  no_log: "{{ samba_dc_no_log }}"
   register: _samba_dc_provision
   when: samba_dc_provision | bool
   tags:
@@ -56,10 +56,10 @@
     {{ '--site=' + samba_dc_site if samba_dc_site | length > 0 else '' }}
     --realm={{ samba_dc_dns_domain | lower }}
     --username="{{ samba_dc_workgroup }}\administrator"
-    --password={{ samba_dc_admin_password }}
+    --password='{{ samba_dc_admin_password }}'
   args:
     creates: '/var/lib/samba/private/krb5.conf'
-  no_log: "{{ samba_dc_dc_no_log }}"
+  no_log: "{{ samba_dc_no_log }}"
   register: _samba_dc_join
   when: not samba_dc_provision | bool
   tags:
