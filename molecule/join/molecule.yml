@@ -14,7 +14,7 @@ lint: |
   ansible-lint
 platforms:
   - name: dc1
-    image: ${MOLECULE_IMG:-"jam82/molecule-fedora:latest"}
+    image: ${MOLECULE_IMG:-"jomrr/molecule-fedora:latest"}
     command: ${MOLECULE_IMG_CMD:-""}
     pre_build_image: true
     privileged: true
@@ -40,7 +40,7 @@ platforms:
       - "~/src/ansible:/opt/roles:rw"
       - "~/src:/opt/src:rw"
   - name: dc2
-    image: ${MOLECULE_IMG:-"jam82/molecule-fedora:latest"}
+    image: ${MOLECULE_IMG:-"jomrr/molecule-fedora:latest"}
     command: ${MOLECULE_IMG_CMD:-""}
     pre_build_image: true
     privileged: true

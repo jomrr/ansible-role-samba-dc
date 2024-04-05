@@ -4,13 +4,13 @@
 
 galaxy_info:
   role_name: samba
-  author: jam82
+  author: jomrr
   description: Ansible role for setting up samba.
   company: ''
 
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
-  issue_tracker_url: https://github.com/jam82/ansible-role-samba-dc/issues
+  issue_tracker_url: https://github.com/jomrr/ansible-role-samba-dc/issues
 
   license: MIT
 

@@ -1,6 +1,6 @@
 # ansible-role-samba-dc
 
-![GitHub](https://img.shields.io/github/license/jam82/ansible-role-samba-dc) [![Build Status](https://travis-ci.org/jam82/ansible-role-samba-dc.svg?branch=main)](https://travis-ci.org/jam82/ansible-role-samba-dc)
+![GitHub](https://img.shields.io/github/license/jomrr/ansible-role-samba-dc) [![Build Status](https://travis-ci.org/jomrr/ansible-role-samba-dc.svg?branch=main)](https://travis-ci.org/jomrr/ansible-role-samba-dc)
 
 **Ansible role for setting up samba as active directory domain controller.**
 
@@ -158,11 +158,11 @@ Also set `hosts_domain: 'samdom.localdomain'` so `hostname -f` shows the hosts f
 
 ## License and Author
 
-- Author:: [jam82](https://github.com/jam82/)
-- Copyright:: 2021, [jam82](https://github.com/jam82/)
+- Author:: [jomrr](https://github.com/jomrr/)
+- Copyright:: 2021, [jomrr](https://github.com/jomrr/)
 
 Licensed under [MIT License](https://opensource.org/licenses/MIT).
-See [LICENSE](https://github.com/jam82/ansible-role-samba-dc/blob/master/LICENSE) file in repository.
+See [LICENSE](https://github.com/jomrr/ansible-role-samba-dc/blob/master/LICENSE) file in repository.
 
 ## References
 
