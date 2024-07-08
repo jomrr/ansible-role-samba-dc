@@ -12,7 +12,7 @@
 #     - samba-dc:services
 
 - name: "Services | Disable conflicting services"
-  service:
+  ansible.builtin.service:
     name: "{{ item }}"
     enabled: false
     state: stopped
@@ -21,7 +21,7 @@
     - samba-dc:services
 
 - name: "Services | Systemd | Mask conflicting services"
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: true
     name: "{{ item }}"
     enabled: false
@@ -33,7 +33,7 @@
     - samba-dc:services
 
 - name: "Services | Systemd | Unmask required services"
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     masked: false
   loop: "{{ samba_dc_enabled_services }}"

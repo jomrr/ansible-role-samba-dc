@@ -3,14 +3,14 @@
 # file: tasks/provision.yml
 
 - name: "Provision | Check if krb5.conf exists"
-  stat:
+  ansible.builtin.stat:
     path: '/var/lib/samba/private/krb5.conf'
   register: samba_dc_krb5
   tags:
     - samba-dc:provision
 
 - name: "Provision | Remove /etc/samba/smb.conf if krb5.conf does not exists"
-  file:
+  ansible.builtin.file:
     path: '/etc/samba/smb.conf'
     state: absent
   when: not samba_dc_krb5.stat.exists | bool
@@ -18,10 +18,10 @@
     - samba-dc:provision
 
 - name: "Provision | Write smb.conf"
-  template:
+  ansible.builtin.template:
     src: "etc/samba/smb.conf.j2"
     dest: "/etc/samba/smb.conf"
-    mode: 0644
+    mode: "0644"
     validate: testparm -s %s
   register: samba_dc_conf
   tags:
@@ -30,7 +30,7 @@
 
 # CHECK: Archlinux was missing LD_LIBRARY_PATH for libicui18n.so.69.
 - name: "Provision | DC Provisioning new AD Forest"
-  shell: >
+  ansible.builtin.shell: >
     LD_LIBRARY_PATH="/usr/lib" samba-tool domain provision
     --server-role=dc
     {{ '--use-rfc2307' if samba_dc_rfc2307 | bool }}
@@ -49,7 +49,7 @@
     - samba-dc:provision:samba-tool
 
 - name: "Provision | DC Join to existing AD Forest"
-  shell: >
+  ansible.builtin.shell: >
     LD_LIBRARY_PATH="/usr/lib" samba-tool domain join
     {{ samba_dc_dns_domain | lower }} DC
     --dns-backend={{ samba_dc_dns_backend | upper }}
@@ -69,10 +69,10 @@
 # no handler, because we need to work with a running samba.
 # handlers are always triggered at the end of a play.
 - name: "Provision | Copy Kerberos Configuration to /etc"
-  copy:
+  ansible.builtin.copy:
     src: '/var/lib/samba/private/krb5.conf'
     dest: '/etc/krb5.conf'
-    mode: 0644
+    mode: "0644"
     remote_src: true
   when: _samba_dc_provision is changed
     or _samba_dc_join is changed
@@ -82,7 +82,7 @@
 
 # no handler, because we need to work with a running samba...
 - name: "Provision | Restart samba service(s) if smb.conf changed"
-  service:
+  ansible.builtin.service:
     name: "{{ item }}"
     state: restarted
   loop: "{{ samba_dc_enabled_services }}"
@@ -93,13 +93,13 @@
     - samba-dc:provision:smb.conf
 
 - name: "Provision | Disable expiry of Administrator account"
-  command: samba-tool user setexpiry Administrator --noexpiry
+  ansible.builtin.command: samba-tool user setexpiry Administrator --noexpiry
   changed_when: false
   tags:
     - samba-dc:provision
 
 - name: "Provision | Set default password policy"
-  command: |
+  ansible.builtin.command: |
     samba-tool domain passwordsettings set
     --complexity={{ samba_dc_pwd_complexity }}
     --min-pwd-age={{ samba_dc_pwd_min_age }}

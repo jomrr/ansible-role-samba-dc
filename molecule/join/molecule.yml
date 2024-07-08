@@ -69,7 +69,7 @@ provisioner:
   name: ansible
   log: true
   playbooks:
-    prepare: prepare.yml
+    prepare: ../resources/playbooks/prepare.yml
     converge: converge.yml
     verify: ../resources/playbooks/verify.yml
   inventory:

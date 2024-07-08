@@ -9,8 +9,8 @@ dependency:
 driver:
   name: vagrant
   provider:
-    name: virtualbox
-    type: virtualbox
+    name: libvirt
+    type: libvirt
 lint: |
   set -e
   yamllint .
@@ -40,17 +40,14 @@ provisioner:
   name: ansible
   log: true
   playbooks:
-    prepare: prepare.yml
+    prepare: ../resources/playbooks/prepare.yml
     converge: converge.yml
     verify: ../resources/playbooks/verify.yml
   inventory:
     group_vars:
       all:
-        common_role_enabled: true
-        hosts_role_enabled: true
         hosts_ip_static: true
         hosts_domain: 'samdom.localdomain'
-        sysctl_role_enabled: true
         samba_dc_role_enabled: true
         samba_dc_domain_provision: true
         samba_dc_dns_domain: 'samdom.localdomain'

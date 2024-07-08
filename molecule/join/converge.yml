@@ -8,4 +8,4 @@
   gather_facts: true
   serial: 1  # provision one instance at a time, so dc1 is ready for dc2 to join
   roles:
-    - role: '../ansible-role-samba-dc'
+    - role: "{{ lookup('ansible.builtin.env', 'MOLECULE_PROJECT_DIRECTORY') }}"

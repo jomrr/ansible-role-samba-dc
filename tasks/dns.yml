@@ -3,7 +3,7 @@
 # file: tasks/ad_dns.yml
 
 - name: "DNS | Create reverse lookup zones"
-  shell: >
+  ansible.builtin.shell: >
     unset HISTFILE;
     samba-tool dns zonecreate 127.0.0.1 {{ item.zone }}
     --username=Administrator
@@ -21,7 +21,7 @@
     - samba-dc:dns
 
 - name: "DNS | Create reverse lookup PTR entries for DC"
-  shell: >
+  ansible.builtin.shell: >
     unset HISTFILE;
     samba-tool dns add 127.0.0.1
     {{ item.zone }} {{ item.ptr }} PTR
@@ -41,7 +41,7 @@
     - samba-dc:dns
 
 - name: "DNS | Create global and site-specific kerberos UDP SRV record for DC"
-  shell: >
+  ansible.builtin.shell: >
     unset HISTFILE;
     samba-tool dns add 127.0.0.1 _msdcs.{{ samba_dc_dns_domain | lower }}
     {{ item }}

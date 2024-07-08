@@ -6,4 +6,4 @@
   hosts: all
   become: true
   roles:
-    - role: '../ansible-role-samba-dc'
+    - role: "{{ lookup('ansible.builtin.env', 'MOLECULE_PROJECT_DIRECTORY') }}"

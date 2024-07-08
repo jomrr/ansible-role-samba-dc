@@ -3,7 +3,7 @@
 # file: tasks/facts.yml
 
 - name: "Gather facts"
-  gather_facts:
+  ansible.builtin.gather_facts:
   tags:
     - samba-dc:dns
     - samba-dc:facts
@@ -11,18 +11,16 @@
     - samba-dc:provision:smb.conf
 
 - name: "Facts | Set facts derived from variables or other gathered facts"
-  set_fact:
-    inside_container: >-
-      {{ (  ansible_virtualization_role == 'guest'
-        and ansible_virtualization_type in ['container', 'docker', 'lxc'] ) }}
+  ansible.builtin.set_fact:
+    inside_container: "{{ (ansible_virtualization_role == 'guest' and ansible_virtualization_type in ['container', 'docker', 'lxc']) }}"
     samba_dc_fqdn: "{{ ansible_hostname | lower }}.{{ samba_dc_dns_domain | lower }}"
     samba_dc_workgroup: "{{ samba_dc_dns_domain | regex_replace('^(.*)\\.(.*)', '\\1') | upper }}"
     samba_dc_dns_reverse_zones: |
       {% set reverse_zones = [] -%}
       {% for iface in samba_dc_interfaces | difference(['lo']) -%}
-        {% set zone = hostvars[inventory_hostname]['ansible_' + iface].ipv4.address | ipaddr('revdns') | regex_replace('^([0-9]+)\\.(.*)\\.', '\\2') -%}
-        {% set ptr = hostvars[inventory_hostname]['ansible_' + iface].ipv4.address | ipaddr('revdns') | regex_replace('\\.$', '') -%}
-        {% set extend_result = reverse_zones.extend([{ 'zone': zone, 'ptr': ptr }]) -%}
+        {% set zone = hostvars\[inventory_hostname]['ansible_' + iface].ipv4.address | ipaddr('revdns') | regex_replace('^([0-9]+)\\.(.*)\\.', '\\2') -%}
+        {% set ptr = hostvars\[inventory_hostname]['ansible_' + iface].ipv4.address | ipaddr('revdns') | regex_replace('\\.$', '') -%}
+        {% set extend_result = reverse_zones.extend([{'zone': zone, 'ptr': ptr}]) -%}
       {% endfor -%}
       {{ reverse_zones }}
   tags:
@@ -33,7 +31,7 @@
     - samba-dc:resolver
 
 - name: "Debug DC DNS reverse zones"
-  debug:
+  ansible.builtin.debug:
     msg: "Zone: {{ item.zone }}, PTR Record: {{ item.ptr }}"
   loop: "{{ samba_dc_dns_reverse_zones }}"
   tags:
@@ -41,7 +39,7 @@
     - samba-dc:facts
 
 - name: "Debug inside_container"
-  debug:
+  ansible.builtin.debug:
     msg: "{{ inside_container }}"
   tags:
     - samba-dc:resolver

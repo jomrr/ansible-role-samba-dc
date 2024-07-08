@@ -8,27 +8,27 @@
   gather_facts: true
   tasks:
     - name: "DNS | Verify netlogon and sysvol shares"
-      command: "smbclient -L localhost -N"
+      ansible.builtin.command: "smbclient -L localhost -N"
       changed_when: false
       register: samba_dc_check_shares
 
     - name: "DNS | Verify _ldap SRV record"
-      command: "host -t SRV _ldap._tcp.{{ samba_dc_dns_domain | lower }}."
+      ansible.builtin.command: "host -t SRV _ldap._tcp.{{ samba_dc_dns_domain | lower }}."
       changed_when: false
       register: samba_dc_check_ldap_srv
 
     - name: "DNS | Verify _kerberos SRV record"
-      command: "host -t SRV _kerberos._udp.{{ samba_dc_dns_domain | lower }}."
+      ansible.builtin.command: "host -t SRV _kerberos._udp.{{ samba_dc_dns_domain | lower }}."
       changed_when: false
       register: samba_dc_check_kerberos_srv
 
     - name: "DNS | Verify host A record"
-      command: "host -t A {{ ansible_hostname }}.{{ samba_dc_dns_domain | lower }}."
+      ansible.builtin.command: "host -t A {{ ansible_hostname }}.{{ samba_dc_dns_domain | lower }}."
       changed_when: false
       register: samba_dc_check_host_a
 
     - name: "Kerberos | Verify kerberos authentication"
-      shell: |
+      ansible.builtin.shell: |
         kinit administrator<<EOC
         {{ samba_dc_admin_password }}
         EOC
@@ -37,7 +37,7 @@
       register: samba_dc_check_kerberos
 
     - name: "Assertions"
-      assert:
+      ansible.builtin.assert:
         that:
           - "'netlogon' in samba_dc_check_shares.stdout"
           - "'sysvol' in samba_dc_check_shares.stdout"

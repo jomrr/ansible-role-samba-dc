@@ -6,67 +6,58 @@
   hosts: all
   become: true
   gather_facts: true
-  roles:  # to enable required roles put them in requirements.yml and add here
-    - common
-    - hosts
-    - sysctl
   vars:
     pip_packages:
       - ansible
       - cryptography
   tasks:
     - name: "Update apk cache"
-      apk:
+      community.general.apk:
         update_cache: true
       when: ansible_pkg_mgr == "apk"
 
     - name: "Update apt cache"
-      apt:
+      ansible.builtin.apt:
         update_cache: true
       when: ansible_pkg_mgr == "apt"
 
     - name: "Update dnf cache"
-      dnf:
+      ansible.builtin.dnf:
         update_cache: true
       when: ansible_pkg_mgr == "dnf"
 
     - name: "Update pacman cache"
-      pacman:
+      community.general.pacman:
         update_cache: true
       when: ansible_pkg_mgr == "pacman"
 
-    - name: "Update yum cache"
-      yum:
-        update_cache: true
-      when: ansible_pkg_mgr == "yum"
-
     - name: "Update zypper cache"
-      zypper:
+      community.general.zypper:
         name: sudo
         update_cache: true
       when: ansible_pkg_mgr == "zypper"
 
     - name: "Install Debian development"
+      when: ansible_pkg_mgr == "apt"
       block:
         - name: "Upgrade all"
-          apt:
+          ansible.builtin.apt:
             upgrade: full
-        - name: "install pip"
-          apt:
+        - name: "Install pip"
+          ansible.builtin.apt:
             name: python3-pip
-        - name: "pip ansible"
-          pip:
+        - name: "Pip ansible"
+          ansible.builtin.pip:
             name: "{{ item }}"
           loop: "{{ pip_packages }}"
-      when: ansible_pkg_mgr == "apt"
 
     - name: "Install Fedora development"
+      when: ansible_pkg_mgr == "dnf"
       block:
         - name: "Install python-pip"
-          dnf:
+          ansible.builtin.dnf:
             name: python3-pip
         - name: "Install pip packages"
-          pip:
+          ansible.builtin.pip:
             name: "{{ item }}"
           loop: "{{ pip_packages }}"
-      when: ansible_pkg_mgr == "dnf"
