@@ -1,5 +1,0 @@
----
-# name: jomrr.samba-dc
-# file: meta/requirements.yml
-
-- name: community.general
